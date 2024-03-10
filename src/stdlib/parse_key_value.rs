@@ -438,7 +438,7 @@ fn parse_key<'a, E: ParseError<&'a str> + ContextError<&'a str>>(
                     parse_delimited('"', key_value_delimiter),
                     parse_delimited('"', field_delimiter),
                     verify(parse_undelimited(key_value_delimiter), |s: &str| {
-                        !s.contains(field_delimiter) && s.chars().any(|c| c != '\'' || c != '\"')
+                        !s.is_empty() && !s.contains(field_delimiter)
                     }),
                     parse_undelimited(field_delimiter),
                 )),
@@ -983,6 +983,19 @@ mod test {
             want: Ok(value!({
                 "argh": "no",
                 "=": true,
+            })),
+            tdef: type_def(),
+        }
+
+        field_delimiter_followed_by_unpaired_quote_followed_by_key_value_delimiter {
+            args: func_args! [
+                value: r"argh=no '=",
+                key_value_delimiter: "=",
+                field_delimiter: " ",
+            ],
+            want: Ok(value!({
+                "argh": "no",
+                "'": "",
             })),
             tdef: type_def(),
         }
