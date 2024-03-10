@@ -704,6 +704,23 @@ mod test {
     }
 
     #[test]
+    fn test_parse_quoted_key_values_with_escapes() {
+        assert_eq!(
+            Ok(vec![
+                (r#"key1 \t"#.to_string().into(), r#"val1 \\"#.into()),
+                (r#"key2 \\"#.to_string().into(), r#"val2 \""#.into())
+            ]),
+            parse(
+                r#""key1 \t"="val1 \\","key2 \\"='val2 \"'"#,
+                "=",
+                ",",
+                Whitespace::Lenient,
+                false
+            )
+        );
+    }
+
+    #[test]
     fn test_parse_key_values_with_single_quotes_and_nested_double_quotes() {
         assert_eq!(
             Ok(vec![
